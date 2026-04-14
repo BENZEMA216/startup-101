@@ -2,6 +2,8 @@
 
 > 面向 AI 菜鸟创业者的排雷 Claude Code Skill — 从"想干"到"拿到第一笔钱"的 0→1 阶段，跨境原生。
 
+**English**: see [README_EN.md](./README_EN.md)
+
 ## 这是什么
 
 startup-101 是一个 [Claude Code](https://claude.com/claude-code) Skill，帮第一次创业的 AI 工程师/研究员理清：
