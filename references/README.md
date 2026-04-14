@@ -6,11 +6,16 @@
 
 ```
 references/
-├── bundled/              # License 清楚的全文内置
-│   └── (v0.1 暂空，v0.2 添加 YC SAFE / Karpathy / Simon Willison / Cooley GO)
+├── bundled/              # License 清楚的全文内置（v0.2 仅 README + 计划，实际文件 v0.3 逐项核对 License 后入）
+│   └── README.md         # 计划与 License 状态说明
 └── index/                # 摘要 + URL + 中文要点
-    ├── 02-incorporation.md       [v0.1]
-    └── 05-fundraising.md         [v0.1, 石头深度嵌入]
+    ├── 01-ideas-and-validation.md   [v0.2]
+    ├── 02-incorporation.md          [v0.1]
+    ├── 03-hiring-equity.md          [v0.2]
+    ├── 04-ai-tech.md                [v0.2]
+    ├── 05-fundraising.md            [v0.1, 石头深度嵌入]
+    ├── 06-vc-voices.md              [v0.2]
+    └── 07-cross-border.md           [v0.2]
 ```
 
 ## 引用策略
