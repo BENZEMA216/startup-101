@@ -141,7 +141,7 @@
 - Privacy Policy 中必须公示代表联系方式
 - 同时检查：Privacy Policy / Cookie Banner / DPA 模板 / SCC (如数据出欧)
 
-**阅读：** `references/index/05-fundraising.md` 的跨境合规章节（v0.1）/ `appendix/compliance-matrix.md` (v0.2)
+**阅读：** `appendix/compliance-matrix.md` § GDPR / `modes/stage-5-ai-launch.md` 决策 4
 
 ---
 

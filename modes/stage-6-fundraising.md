@@ -195,4 +195,4 @@
 5. SPA + Closing 完成
 6. 资金到账 + 公告宣传
 
-→ 进入 Stage 7 Ongoing（v0.2）
+→ 进入 Stage 7 Ongoing

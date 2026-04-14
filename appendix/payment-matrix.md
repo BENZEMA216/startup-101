@@ -1,6 +1,6 @@
 # Payment Matrix — 出海收款方案决策表
 
-> 用于 Stage 3 (Day-30) 参考。v0.1 版本，Stage 3 文件 v0.2 补。
+> 用于 Stage 3 (Day-30) 参考。
 
 ## 收款方案对比
 
