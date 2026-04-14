@@ -49,3 +49,20 @@
 - 内置全文仅限 License 清楚的资源（见 references/README.md）
 - 其他一律通过 references/index/ 做摘要 + URL
 - 用户本地 clip（如 Obsidian）通过环境变量 `$OBSIDIAN_CLIPPINGS` 引用，开源版剔除
+
+## v0.2 stage 覆盖状态
+
+| Stage | 状态 | 文件 |
+|---|---|---|
+| 0 | ✅ | modes/stage-0-profile.md |
+| 1 | ✅ | modes/stage-1-pre-incorp.md |
+| 2 | ✅ | modes/stage-2-incorporation.md |
+| 3 | ✅ | modes/stage-3-day30.md |
+| 4 | ✅ | modes/stage-4-hiring-equity.md |
+| 5 | ✅ | modes/stage-5-ai-launch.md |
+| 6 | ✅ | modes/stage-6-fundraising.md |
+| 7 | ✅ | modes/stage-7-ongoing.md |
+
+## 政策复核时间戳约定
+
+每个 stage / appendix 文件顶部 MUST 标注 `last_policy_review: YYYY-MM-DD`，便于未来重校。v0.2 基线：**2026-04-15**。
