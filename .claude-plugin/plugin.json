@@ -1,0 +1,25 @@
+{
+  "name": "startup-101",
+  "description": "面向 AI 菜鸟创业者的排雷 Claude Code Skill — 从公司架构、AI 合规、跨境收款到融资条款的 0→1 全流程必查清单。Minesweeper for first-time AI founders. Bilingual.",
+  "version": "0.3.0",
+  "author": {
+    "name": "BENZEMA216"
+  },
+  "homepage": "https://github.com/BENZEMA216/startup-101",
+  "repository": "https://github.com/BENZEMA216/startup-101",
+  "license": "MIT",
+  "keywords": [
+    "startup",
+    "ai",
+    "fundraising",
+    "compliance",
+    "cross-border",
+    "incorporation",
+    "china",
+    "safe",
+    "vie",
+    "pipl",
+    "eu-ai-act",
+    "gdpr"
+  ]
+}
