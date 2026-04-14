@@ -1,8 +1,12 @@
+<p align="center">
+  <img src="./assets/social-preview.png" alt="startup-101" width="100%">
+</p>
+
 # startup-101
 
 > A minesweeper Claude Code Skill for first-time AI founders — covers 0→1 from "I want to start a company" to "I've closed my first round", cross-border native.
 
-> **中文**: see [README.md](./README.md) — this skill is primarily written for Chinese-background AI founders; the English README is a pointer for international users who encounter it in a marketplace.
+> **中文**: see [README.md](./README.md) — this skill is primarily written for Chinese-background AI founders; the English README is a pointer for international users who encounter it in a marketplace. **Roadmap**: see [ROADMAP.md](./ROADMAP.md).
 
 ## What this is
 

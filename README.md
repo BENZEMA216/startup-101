@@ -1,8 +1,12 @@
+<p align="center">
+  <img src="./assets/social-preview.png" alt="startup-101" width="100%">
+</p>
+
 # startup-101
 
 > 面向 AI 菜鸟创业者的排雷 Claude Code Skill — 从"想干"到"拿到第一笔钱"的 0→1 阶段，跨境原生。
 
-**English**: see [README_EN.md](./README_EN.md)
+**English**: see [README_EN.md](./README_EN.md) · **Roadmap**: see [ROADMAP.md](./ROADMAP.md)
 
 ## 这是什么
 

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1280px;
+    height: 640px;
+    background: #0a0b0e;
+    color: #e8e8e8;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono { font-family: "SF Mono", Menlo, Monaco, Consolas, monospace; }
+  .sans { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif; }
+
+  .card {
+    width: 1280px;
+    height: 640px;
+    position: relative;
+    background:
+      radial-gradient(circle at 85% 20%, rgba(239, 68, 68, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 15% 85%, rgba(16, 185, 129, 0.09) 0%, transparent 50%),
+      #0a0b0e;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 90px 1fr 110px;
+    padding: 0 72px;
+  }
+
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 380px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ef4444);
+    z-index: 5;
+  }
+
+  /* Row 1: top */
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 50px;
+    z-index: 3;
+  }
+  .brand {
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-size: 18px;
+    color: #6b7280;
+    letter-spacing: 0.02em;
+  }
+  .brand .dot { color: #ef4444; margin: 0 10px; }
+  .version {
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-size: 14px;
+    color: #d4d4d8;
+    padding: 6px 14px;
+    border: 1px solid #27272a;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.03);
+  }
+
+  /* Row 2: title block */
+  .title-block {
+    z-index: 3;
+    align-self: center;
+    padding: 12px 0;
+  }
+  .title {
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-weight: 800;
+    font-size: 110px;
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+    color: #fafafa;
+    margin-bottom: 22px;
+  }
+  .title .dash { color: #ef4444; }
+  .title .num { color: #10b981; }
+  .subtitle {
+    font-family: "PingFang SC", "Hiragino Sans GB", -apple-system, sans-serif;
+    font-size: 34px;
+    font-weight: 500;
+    color: #e4e4e7;
+    line-height: 1.3;
+    margin-bottom: 10px;
+    letter-spacing: -0.005em;
+  }
+  .en-subtitle {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 19px;
+    font-weight: 400;
+    color: #71717a;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+
+  /* Row 3: bottom */
+  .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 50px;
+    z-index: 3;
+  }
+  .stages {
+    display: flex;
+    gap: 8px;
+  }
+  .stage {
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: #a1a1aa;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #27272a;
+    border-radius: 6px;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  .stage .num {
+    color: #10b981;
+    margin-right: 6px;
+    font-weight: 700;
+  }
+  .flags-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 10px;
+  }
+  .flag-icon { font-size: 26px; line-height: 1; }
+  .flag-text { display: flex; flex-direction: column; line-height: 1; }
+  .flag-count {
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-size: 22px;
+    font-weight: 800;
+    color: #ef4444;
+    line-height: 1;
+  }
+  .flag-label {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: #d4d4d8;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid-bg"></div>
+  <div class="corner"></div>
+
+  <div class="top-row">
+    <div class="brand">for AI founders <span class="dot">·</span> 2026</div>
+    <div class="version">v0.3</div>
+  </div>
+
+  <div class="title-block">
+    <div class="title">startup<span class="dash">-</span><span class="num">101</span></div>
+    <div class="subtitle">AI 菜鸟创业者的排雷 Skill</div>
+    <div class="en-subtitle">Company structure · AI compliance · Cross-border payments · Fundraising — from 0 to 1</div>
+  </div>
+
+  <div class="bottom-row">
+    <div class="stages">
+      <div class="stage"><span class="num">0</span>Profile</div>
+      <div class="stage"><span class="num">1</span>Pre-incorp</div>
+      <div class="stage"><span class="num">2</span>Incorp</div>
+      <div class="stage"><span class="num">3</span>Day-30</div>
+      <div class="stage"><span class="num">4</span>Equity</div>
+      <div class="stage"><span class="num">5</span>AI Launch</div>
+      <div class="stage"><span class="num">6</span>Fundraising</div>
+      <div class="stage"><span class="num">7</span>Ongoing</div>
+    </div>
+    <div class="flags-badge">
+      <div class="flag-icon">🚩</div>
+      <div class="flag-text">
+        <div class="flag-count">6</div>
+        <div class="flag-label">Red Flags</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
