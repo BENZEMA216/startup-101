@@ -1,0 +1,6 @@
+.DS_Store
+_profile.md
+startup-checklist.md
+*.swp
+.idea/
+.vscode/
