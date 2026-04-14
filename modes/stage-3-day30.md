@@ -2,6 +2,14 @@
 
 > last_policy_review: 2026-04-15
 
+## 读取前置状态
+
+从 `_profile.md` 读取：
+- `stage_2_output.chosen_path` — 决定本阶段走哪套流程（内资 / WFOE+Cayman+HK / Delaware 单主体…）
+- `stage_2_output.wfoe_formed`, `domestic_entity_formed`, `delaware_entity_formed` 等 — 已有哪些实体就对应开户 / 登记
+- `stage_2_output.bank_accounts_opened` — 若 partial / no，本阶段决策 1 需深入
+- `city` — 决定社保 / 公积金基数 + 代账推荐方向
+
 ## 何时进入
 
 - Stage 2 完成：营业执照 / Certificate of Incorporation 已到手
@@ -251,14 +259,17 @@ WFOE（国内研发 / 员工）
 - `references/index/02-incorporation.md` — Stripe Atlas 文档
 - Stripe Atlas *International Expansion Guide*
 
-## 本阶段结束状态
+## 本阶段输出（写入 _profile.md）
 
-用户能回答：
-1. 对公 / 美元 / Mercury 账户能正常收付款吗？
-2. 税务登记完成？税种核定完成？
-3. 发票模板打通了？
-4. 代账 / 会计落位？
-5. 社保 / 公积金 / Payroll 全员正常缴纳？
-6.（B）WFOE 收到 Cayman 的首笔服务费结汇了？Transfer Pricing 合同归档？
+```yaml
+stage_3_output:
+  completed_at: <YYYY-MM-DD>
+  tax_registration_done: <yes | no | not_applicable>
+  bookkeeping_provider: <代账 | 自记 | 混合>
+  invoice_setup_done: <yes | no | not_applicable>
+  vat_taxpayer_type: <一般纳税人 | 小规模纳税人 | not_applicable>
+  social_insurance_setup: <yes | no | not_applicable>
+  transfer_pricing_framework_drafted: <yes | no | not_applicable>
+```
 
-确认后进入 Stage 4 Hiring & Equity。
+并在 `completed_stages` 追加 `3`。确认后进入 Stage 4 Hiring & Equity。

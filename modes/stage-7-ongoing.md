@@ -2,6 +2,16 @@
 
 > last_policy_review: 2026-04-15
 
+## 读取前置状态
+
+从 `_profile.md` 读取：
+- `stage_2_output.chosen_path` — 决定要维护哪套实体的持续义务
+- `stage_2_output.wfoe_formed` / `hk_entity_formed` / `delaware_entity_formed` 等 — 各实体年报 / 审计日历
+- `stage_3_output.transfer_pricing_framework_drafted` — 若 no，本阶段要补
+- `stage_5_output.eu_ai_act_gpai_trigger` — 若 yes，需加入 GPAI 年检日历
+- `stage_6_output.closed` + `amount_raised` — 决定 FBAR / Form 5472 / 对赌对接节奏
+- `founders_tax_residency` — FBAR / 个税汇算口径
+
 ## 何时进入
 
 - 融资完成（Stage 6 完成）或 产品稳定运营 6+ 个月
@@ -305,9 +315,33 @@
 - [ ] PIPL 出境 3 年到期前 3 个月复核
 ```
 
-## 本阶段结束状态
+## 本阶段输出（写入 _profile.md）
 
-Stage 7 没有"结束"— 持续直到公司退出（IPO / 并购 / 清算）。**目标是把合规从"紧急事件驱动"转为"日历驱动"。**
+Stage 7 没有一次性"结束"— 建议每年度末运行一次本 stage，更新如下 section：
+
+```yaml
+stage_7_output:
+  completed_at: <YYYY-MM-DD>   # 本轮更新时间
+  monthly_cadence_set: <yes | no>
+  quarterly_cadence_set: <yes | no>
+  annual_filings_done:
+    cit_settlement: <yes | no | not_applicable>
+    iit_settlement: <yes | no | not_applicable>
+    annual_report_aic: <yes | no | not_applicable>
+    wfoe_joint_annual: <yes | no | not_applicable>
+    wfoe_audit: <yes | no | not_applicable>
+    hk_audit: <yes | no | not_applicable>
+    sg_acra_ar: <yes | no | not_applicable>
+    delaware_franchise_tax: <yes | no | not_applicable>
+    form_5472: <yes | no | not_applicable>
+    fbar: <yes | no | not_applicable>
+  transfer_pricing_doc: <yes | no | not_applicable>
+  gpai_annual_review: <yes | no | not_applicable>
+```
+
+`completed_stages` 第一次追加 `7`（后续只更新 `completed_at` 和内部字段）。
+
+**目标是把合规从"紧急事件驱动"转为"日历驱动"。**
 
 Skill 完成使命，推荐：
 - 每半年运行一次 `/startup-101 redflags` 全扫

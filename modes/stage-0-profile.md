@@ -2,6 +2,12 @@
 
 > 目标：4 个核心问题 + 若干补充问题，判定用户属于 A/B/C 哪档，初始化 `_profile.md`。
 
+## 读取前置状态
+
+Stage 0 是入口，**无前置依赖**。但若 `_profile.md` 已存在：
+- 检查 `profile_schema_version`，若 < 0.3 走 SKILL.md 的迁移流程
+- 检查 `archetype` 是否已填，若已填则询问用户是否重做 profile
+
 ## Flow
 
 ### 开场
@@ -86,3 +92,14 @@ ELSE:
 ## 完成条件
 
 用户 `_profile.md` 的前 5 组字段全部填充，`archetype` 非空。
+
+## 本阶段输出（写入 _profile.md）
+
+```yaml
+stage_0_output:
+  completed_at: <YYYY-MM-DD>
+  archetype: <A | B | C>
+  primary_ambiguity: <若有 profile 答案歧义 / 还不确定项，在此记录；否则 null>
+```
+
+并在 `completed_stages` 追加 `0`。

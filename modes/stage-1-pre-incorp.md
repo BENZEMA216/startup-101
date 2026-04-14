@@ -2,6 +2,15 @@
 
 > last_policy_review: 2026-04-15
 
+## 读取前置状态
+
+从 `_profile.md` 读取：
+- `team_size`, `roles`, `founder_background` — 决定是否需要联创协议 + 主创背景
+- `archetype` — 决定本阶段分支提问重点（A 可跳过 37 号文 / 税籍迁移讨论）
+- `founders_tax_residency` — 决定决策 4（个人税籍锁定）
+- `fundraising_intent` + `target_currency` — 决定决策 3（架构前置判断）
+- `stage_0_output.archetype` — 作为决策依据
+
 ## 何时进入
 
 - 还没注册公司
@@ -135,13 +144,21 @@
 - `references/index/05-fundraising.md` § 石头《融资指南》§10.2 创始人个人责任 / §10.3 控制权
 - Paul Graham *How to Start a Startup*
 
-## 本阶段结束状态
+## 本阶段输出（写入 _profile.md）
 
-用户能回答：
-1. 几个联创？协议签了没？
-2. 股权怎么分？vesting 写了没？期权池留了多少？
-3. 预选了哪条架构路径？为什么？
-4. 创始人个人税籍处理了吗？
-5. 找好律所了吗？
+按 `_profile.template.md` 中 `stage_1_output` schema 写入：
 
-确认后进入 Stage 2 Incorporation。
+```yaml
+stage_1_output:
+  completed_at: <YYYY-MM-DD>
+  founder_count: <1 | 2 | 3 | 4+>
+  founder_agreement_signed: <yes | no | not_applicable>
+  vesting_structure: <"4+1" | "3+1" | "other:..." | none>
+  equity_split_decided: <yes | no>
+  esop_pool_reserved_pct: <0-20>
+  arch_path_shortlist: <A | B1 | B2 | C1 | C2>
+  personal_tax_residency_plan: <不动 | 迁港 | 迁新 | 迁美 | 其他>
+  counsel_shortlisted: <yes | no>
+```
+
+并在 `completed_stages` 追加 `1`，然后进入 Stage 2 Incorporation。

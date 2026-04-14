@@ -2,6 +2,14 @@
 
 > last_policy_review: 2026-04-15
 
+## 读取前置状态
+
+从 `_profile.md` 读取：
+- `archetype`, `target_currency`, `rnd_location`, `founders_tax_residency` — 决定走哪条架构分支
+- `stage_1_output.arch_path_shortlist` — 用户在 Stage 1 预选的路径（A / B1 / B2 / C1 / C2）
+- `stage_1_output.esop_pool_reserved_pct`, `equity_split_decided` — 决定章程 / cap table 初始结构
+- `stage_1_output.counsel_shortlisted` — 若 no，本阶段需反复提示"必须找律师"
+
 ## 何时进入
 
 - Stage 1 完成：架构路径已定
@@ -223,15 +231,21 @@ WFOE（深圳/上海/北京，承担中国研发 + 员工）
   - Index Ventures Founder Handbook
 - 石头《融资指南》§11 出海架构章节
 
-## 本阶段结束状态
+## 本阶段输出（写入 _profile.md）
 
-用户持有：
-1. 营业执照 / Certificate of Incorporation
-2. 章程（中英）
-3. 股东协议（联创 vesting + IP）
-4. 公司所有公章（Path A）/ 公司印鉴（Path B/C）
-5. 37 号文登记证明（Path B）
-6. ODI 备案证明（Path B）
-7. 银行开户预约或已开户
+```yaml
+stage_2_output:
+  completed_at: <YYYY-MM-DD>
+  chosen_path: <A | B1 | B2 | C1 | C2>
+  cayman_entity_formed: <yes | no | not_applicable>
+  delaware_entity_formed: <yes | no | not_applicable>
+  singapore_entity_formed: <yes | no | not_applicable>
+  hk_entity_formed: <yes | no | not_applicable>
+  wfoe_formed: <yes | no | not_applicable>
+  domestic_entity_formed: <yes | no | not_applicable>
+  37_wen_registered: <yes | no | not_applicable | in_progress>
+  odi_filed: <yes | no | not_applicable | in_progress>
+  bank_accounts_opened: <yes | partial | no>
+```
 
-确认后进入 Stage 3 Day-30。
+并在 `completed_stages` 追加 `2`。确认后进入 Stage 3 Day-30。

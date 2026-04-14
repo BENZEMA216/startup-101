@@ -3,6 +3,14 @@
 > last_policy_review: 2026-04-15
 > **本阶段是本 skill 最技术敏感、时间窗口最紧的部分。政策更新最快，上线前 30 天请再走一遍最新政策核对。**
 
+## 读取前置状态
+
+从 `_profile.md` 读取：
+- `ai_track`, `self_trained_model`, `public_facing`, `generates_content` — 决定走算法备案 / 大模型备案 / 登记哪一轨
+- `user_geography` — 决定是否触发 GDPR / EU AI Act / PIPL 出境
+- `archetype` + `stage_2_output.chosen_path` — 决定数据流 / 实体映射
+- `stage_3_output.transfer_pricing_framework_drafted` — 跨境数据流合规引用点
+
 ## 何时进入
 
 - 产品即将 go-live（国内 / 海外 / 两者）
@@ -354,14 +362,23 @@
 - [GPAI Guidelines](https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers)
 - [《促进和规范数据跨境流动规定》CAC 2024-03](http://www.cac.gov.cn/2024-03/22/c_1712776611775634.htm)
 
-## 本阶段结束状态
+## 本阶段输出（写入 _profile.md）
 
-用户能回答：
-1. 走哪几轨国内备案？时间线？
-2. 语料境外占比多少？授权链齐了没？双水印做了吗？
-3. 欧盟合规清单全过了？Art. 27 / Art. 50 / GPAI？
-4. PIPL 出境走哪档？阈值测过？
-5. CA / CO 法规影响？
-6. 基模 License 无风险？
+```yaml
+stage_5_output:
+  completed_at: <YYYY-MM-DD>
+  domestic_filing_tracks:
+    algorithm_filing: <done | in_progress | not_applicable>
+    large_model_filing: <done | in_progress | not_applicable>
+    registration_only: <done | in_progress | not_applicable>
+  overseas_corpus_pct: <0-100>
+  content_labeling_ready: <yes | no>
+  gdpr_representative_appointed: <yes | no | not_applicable>
+  gdpr_dpa_in_place: <yes | no | not_applicable>
+  eu_ai_act_gpai_trigger: <yes | no>
+  eu_ai_act_gpai_obligations_tracked: <yes | no | not_applicable>
+  pipl_outbound_route: <免评估 | 标准合同 | 安全评估 | 认证 | not_applicable>
+  software_copyright_route: <自主申报 | 不申报 | 走第三方>
+```
 
-确认后进入 Stage 6（融资）或 Stage 7（Ongoing）。
+并在 `completed_stages` 追加 `5`。确认后进入 Stage 6（融资）或 Stage 7（Ongoing）。

@@ -3,6 +3,15 @@
 > last_policy_review: 2026-04-15
 > **本阶段的主干参考是石头《融资指南》，本文件只做导航层。**
 
+## 读取前置状态
+
+从 `_profile.md` 读取：
+- `archetype` + `fundraising_intent` + `target_investors` — 决定美元 / 人民币 / 混合路径
+- `stage_2_output.chosen_path` — 架构是否匹配目标资本（错配 → 翻红筹风险提醒）
+- `stage_2_output.37_wen_registered` — 融美元前硬核查点
+- `stage_4_output.ip_assignment_executed_to` — DD 爆雷点预防
+- `stage_5_output.*` — AI 合规状态会被 VC 在 DD 中问到
+
 ## 何时进入
 
 - 有现金跑道不足 12 个月 OR 主动选择融资加速
@@ -185,14 +194,21 @@
 - Bill Gurley *All Revenue Is Not Created Equal* — https://abovethecrowd.com/
 - Sonya Huang Generative AI 三部曲 — https://www.sequoiacap.com/
 
-## 本阶段结束状态
+## 本阶段输出（写入 _profile.md）
 
-用户完成：
-1. 融 / 不融的决策
-2. 美元 / 人民币路径锁定
-3. BP + 投资人名单
-4. TS 签署（五大类条款符合红线）
-5. SPA + Closing 完成
-6. 资金到账 + 公告宣传
+```yaml
+stage_6_output:
+  completed_at: <YYYY-MM-DD>
+  raise_or_not: <raise | skip>
+  route: <usd | rmb | dual | not_applicable>
+  instrument: <safe | note | priced | not_applicable>
+  termsheet_reviewed_by_counsel: <yes | no | not_applicable>
+  redemption_personal_liability: <none | company_only | founder_personal>   # founder_personal 🚩 硬红线
+  antidilution: <weighted_avg | full_ratchet | none>                        # full_ratchet 🚩
+  board_seats_founder: <integer>
+  cfius_prescreen_done: <yes | no | not_applicable>
+  closed: <yes | no | in_progress>
+  amount_raised: <"$5M seed" | null>
+```
 
-→ 进入 Stage 7 Ongoing
+并在 `completed_stages` 追加 `6`。→ 进入 Stage 7 Ongoing

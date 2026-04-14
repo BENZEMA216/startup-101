@@ -2,6 +2,14 @@
 
 > last_policy_review: 2026-04-15
 
+## 读取前置状态
+
+从 `_profile.md` 读取：
+- `stage_2_output.chosen_path` + `cayman_entity_formed` / `delaware_entity_formed` — 决定 ESOP 设在哪个主体
+- `stage_2_output.37_wen_registered` — 若 no / in_progress 且中国员工将拿 Cayman 期权，本阶段要警告
+- `stage_1_output.esop_pool_reserved_pct` — 作为 ESOP 池规模起点
+- `team_size` — 决定本阶段 churn 强度 + IP Assignment 批量重要度
+
 ## 何时进入
 
 - 公司运营跑通（Stage 3 完成）
@@ -278,13 +286,17 @@
 - Index Ventures — *Rewarding Talent* Handbook
 - 汉坤 / 方达《中国员工境外期权合规指引》
 
-## 本阶段结束状态
+## 本阶段输出（写入 _profile.md）
 
-用户能回答：
-1. 所有员工劳动合同签了？30 日内完成？
-2. ESOP 池规模定了？Cayman/Delaware 层文件齐了？
-3. 所有人 IP Assignment 指向正确主体？
-4. 中国员工 Cayman option 的 37 号文指引？
-5. 竞业协议范围合理 + 付补偿？
+```yaml
+stage_4_output:
+  completed_at: <YYYY-MM-DD>
+  labor_contract_template_ready: <yes | no>
+  esop_cayman_established: <yes | no | not_applicable>
+  esop_delaware_established: <yes | no | not_applicable>
+  ip_assignment_executed_to: <cayman | delaware | sg | wfoe | 个人 | null>
+  employee_37_wen_count: <integer>     # 已完成 37 号文登记的中国员工数
+  pending_37_wen_employees: <integer>  # 尚未登记的中国员工数（持 Cayman option）
+```
 
-确认后进入 Stage 5 AI 产品上线前。
+并在 `completed_stages` 追加 `4`。确认后进入 Stage 5 AI 产品上线前。
