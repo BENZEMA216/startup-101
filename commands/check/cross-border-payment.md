@@ -14,11 +14,15 @@ profile_fields_used:
   - stage_2_output.sg_entity_formed
   - stage_2_output.hk_entity_formed
   - stage_3_output.bank_account_status
+  - stage_3_output.payment_target_start_date
+  - stage_3_output.historical_personal_account_usage
   - payment_model
   - target_currency
 profile_fields_written:
   - stage_3_output.payment_path_chosen
+  - stage_3_output.payment_deadlines
   - stage_3_output.payment_setup_deadline
+  - stage_3_output.payment_followup_commands
 last_policy_review: 2026-04-15
 ---
 
@@ -53,8 +57,8 @@ last_policy_review: 2026-04-15
 2. 业务模型？ `[a] 订阅制 SaaS` `[b] 一次性付费` `[c] To B 开票` `[d] Marketplace 分成` `[e] 混合`
 3. 主要目标币种？ `[USD / EUR / JPY / GBP / 多币种]`
 4. 预期 12 个月 GMV 量级？ `[<$10k / $10-100k / $100k-1M / >$1M]`
-5. 收款紧迫度？ `[立刻能收 / 1-3 个月内 / 架构搭完再说]`
-6. 当前是否已用**个人 PayPal / 微信 / 支付宝**收过境外款？ `[Y/N]` 若 Y → 月流水多少？
+5. **目标首次正式收款日？（用于计算绝对 deadline）** `YYYY-MM-DD / ASAP / 未定`
+6. 当前是否已用**个人 PayPal / 微信 / 支付宝**收过境外款？ `[Y/N]` 若 Y → 月流水多少？ 已经多久？
 
 ## 决策逻辑
 
@@ -90,21 +94,53 @@ archetype == C (Delaware)
 | App Store / Google Play | 平台本身 MoR，落到主体银行 | 平台已经做 MoR 扣税 |
 | 混合 | Stripe + Paddle 双通道 | Stripe 主渠 + Paddle 作为"无主体国家"兜底 |
 
-### 第三层：紧迫度修正
+### 第三层：基于目标收款日的绝对 deadline
+
+把 Q5 的 `payment_target_start_date` 作为锚点，每条路径反推：
+
+| 路径 | 启动 kickoff 最晚日 | 说明 |
+|---|---|---|
+| Paddle MoR | `target_date - 7 days` | 1-3 天接入 + 预留测试 |
+| Stripe（已有主体 + 银行）| `target_date - 14 days` | 审核 + 银行验证 |
+| Stripe（需同步开银行）| `target_date - 45 days` | 银行开户是 critical path |
+| Stripe（需先注册新主体）| `target_date - 120 days` | 注册 + 银行 + 收单串行 |
+| 对公 USD wire 收款 | `target_date - 30 days` | 银行开户为主 |
+
+若 kickoff < 今天 → 🚩 **时间线告警**：
+- Q6 已在个人账户跑流水且月 > $4000 → **立即中止**（RF3），7 天内上 Paddle 过渡
+- 其他情况 → 考虑延后收款 / 临时走 MoR 做 bridge
+
+### 第四层：紧迫度修正
 
 ```
-紧迫度 == 立刻能收
+target_date == ASAP（≤ 7 天）
 ├─ archetype A + 订阅制 → Paddle（最快，1-3 天接入）
 ├─ archetype C + 有 Mercury 预账 → Stripe US（3-7 天）
 ├─ archetype B 但 HK 公司未注册完 → 先走 Paddle，后迁 Stripe
 └─ 无海外主体 → ❌ 停，先开公司，不走"个人 PayPal 归集"（Red Flag 3）
 
-紧迫度 == 1-3 个月
+target_date 在 1-3 个月
 ├─ 可以等 Stripe 审批 / 银行开户 → 走首选方案
 └─ 并行开两条通道（Stripe + Paddle）增加冗余
 
-紧迫度 == 架构搭完再说
+target_date > 3 个月
 └─ 不单独走本命令，回到 Stage 2/3 主线
+```
+
+### 第五层：自动 follow-up 命令注入
+
+```
+Q6 == Y + 月流水 > $4000（RF3 命中）?
+└─ 注入：/startup-101 redflags   # 历史流水可能需要补申报，做完整扫描
+
+Q6 == Y + 月流水 > $4000 + 持续超过 6 个月?
+└─ 注入：/startup-101 check 37hao-exposure   # 外汇暴露面可能已累计
+
+archetype == A 但 GMV 预期 > $200k?
+└─ 注入：/startup-101 compare entity-structure   # （v0.5 补）评估翻红筹成本/收益
+
+Stripe 需要银行作为前置?
+└─ 建议：Stage 3 银行开户子流程并行启动（非自动注入，提示即可）
 ```
 
 ### 第四层：成本建模（建议呈现）
@@ -144,6 +180,18 @@ archetype == C (Delaware)
 1. <具体红旗 1>
 2. <具体红旗 2>
 
+## 绝对 deadline 表
+| 动作 | 最晚完成 | 状态 |
+|---|---|---|
+| 主体 / 银行 kickoff | YYYY-MM-DD | ✅ 还有 N 天 / 🚩 已晚 X 天 |
+| 收单账户提交审核 | YYYY-MM-DD | ✅ / 🚩 |
+| 首次测试收款 | YYYY-MM-DD | ✅ / 🚩 |
+| 目标正式上线收款 | = Q5 输入 | |
+
+## 必须跑的 follow-up 命令（自动生成）
+- [ ] `/startup-101 redflags`（命中条件：RF3 历史流水 > $4k/月）
+- [ ] `/startup-101 check 37hao-exposure`（命中条件：RF3 + 持续 > 6 个月，外汇暴露可能累计）
+
 ## 下一步
 - [ ] 写回 _profile.md (stage_3_output.payment_path_chosen)
 - [ ] 若紧迫度高：同步跑 Stage 3 银行开户子流程
@@ -172,14 +220,23 @@ archetype == C (Delaware)
 
 ```yaml
 stage_3_output:
+  payment_target_start_date: 2026-06-01         # Q5 输入（**必填或 ASAP**）
   payment_path_chosen:
     primary: stripe_hk | stripe_us | paddle | airwallex | ...
     secondary: paddle | null
     rationale: "..."
     estimated_annual_fee_usd: 5800
-  payment_setup_deadline: 2026-05-15
+  payment_deadlines:                            # 绝对日期（由 target_start_date 反推）
+    kickoff: 2026-04-17
+    submission: 2026-05-18
+    test_collection: 2026-05-25
+    go_live: 2026-06-01
+  payment_setup_deadline: 2026-04-17            # 最早的 kickoff
+  payment_followup_commands:
+    - /startup-101 redflags                     # 若 RF3 历史流水 > $4k/月
+    - /startup-101 check 37hao-exposure         # 若 RF3 + > 6 个月
   payment_red_flags: [personal_paypal_historical_usage]
-  payment_scan_date: 2026-04-21
+  payment_scan_date: 2026-04-22
 ```
 
 ## 限界

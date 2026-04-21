@@ -14,10 +14,12 @@ profile_fields_used:
   - stage_2_output.37_wen_registered
   - stage_4_output.employee_37_wen_count
   - stage_4_output.pending_37_wen_employees
+  - stage_4_output.next_funding_dd_date
   - founders_tax_residency
 profile_fields_written:
   - stage_4_output.37hao_exposure_snapshot
   - stage_4_output.37hao_action_deadline
+  - stage_4_output.37hao_followup_commands
 last_policy_review: 2026-04-15
 ---
 
@@ -51,8 +53,9 @@ last_policy_review: 2026-04-15
 1. 你是中国税务居民吗？（过去 183 天在中国累计 ≥183 天 / 户籍 / 家庭中心） `[Y/N/不确定]`
 2. 公司当前是否有境外母公司（Cayman / BVI / SG / Delaware / HK）？ `[Y/N]`
 3. 你是否以**个人**身份直接或通过境外信托 / SPV 持有该母公司股份？ `[Y/N]`
-4. 已有 / 计划给**中国籍员工**发境外母公司 option？ `[Y/N]` 若 Y → 多少人？
+4. 已有 / 计划给**中国籍员工**发境外母公司 option？ `[Y/N]` 若 Y → 多少人？ 已行权多少人？
 5. 上次外管局 37 号文办理 / 更新日期？ `[YYYY-MM-DD / 从未办 / 不确定]`
+6. **下一个融资 DD / 关键业务里程碑的目标日期？（用于计算绝对 deadline）** `YYYY-MM-DD / 暂无`
 
 ## 决策逻辑
 
@@ -112,6 +115,34 @@ archetype == C (Delaware C-corp)
 - **6-8 分**：估值打折 5-15% 风险
 - **≥ 9 分**：交易可能延期 / 破裂，立即停一切融资动作先做合规
 
+### 第五层：绝对 deadline 计算
+
+以 Q6 的 `next_funding_dd_date`（或下一个业务里程碑）为锚点：
+
+| 动作 | 最晚完成 |
+|---|---|
+| 创始人侧补登记启动 | `dd_date - 120 days`（补登记需 2-6 个月） |
+| 员工侧批量补登记启动 | `dd_date - 90 days` |
+| 重大股权变动变更登记 | 变动后 30 日内 |
+
+若任何 deadline < 今天 → 🚩 **立即触发最高级告警**：暂停一切新 option 授予、新股权转让、对外融资接触，直到合规窗口恢复。
+
+### 第六层：自动 follow-up 命令注入
+
+```
+创始人侧未登记 OR 风险评分 ≥ 6？
+└─ 注入：/startup-101 redflags  # 触发 6 条主红旗完整扫描，确认是否还有联动雷
+
+员工侧待登记 ≥ 1 + 已行权？
+└─ 注入：/startup-101 review term-sheet  # （v0.5 补）融资前条款 DD 配套
+
+存在员工期权 + 创始人/员工流水可能走个人账户？
+└─ 注入：/startup-101 check cross-border-payment  # 排查 RF3 联动
+
+每次主扫描结束？
+└─ 建议：/startup-101 redflags  # 作为体检闭环
+```
+
 ## 输出 schema（呈现给用户）
 
 ```markdown
@@ -122,10 +153,21 @@ archetype == C (Delaware C-corp)
 **员工侧状态**：<分数 + 动作>
 **融资 DD 爆雷风险评分**：X / 10
 
+## 绝对 deadline 表（基于下一个 DD / 里程碑日期）
+| 动作 | 最晚完成 | 状态 |
+|---|---|---|
+| 创始人侧补登记启动 | YYYY-MM-DD | ✅ 还有 N 天 / 🚩 已晚 X 天 |
+| 员工侧批量补登记启动 | YYYY-MM-DD | ✅ / 🚩 |
+| 重大变动变更登记 | 变动后 30 日 | 常态化 |
+
 ## 🚩 必须在 N 天内完成的动作
-1. <具体动作 1，带 deadline>
+1. <具体动作 1，带绝对日期>
 2. <具体动作 2>
 3. <具体动作 3>
+
+## 必须跑的 follow-up 命令（自动生成）
+- [ ] `/startup-101 redflags`（命中条件：创始人未登记 OR 风险评分 ≥ 6）
+- [ ] `/startup-101 check cross-border-payment`（命中条件：员工期权发放 + 疑似个人账户流水）
 
 ## 推荐跨境律所类型（非背书）
 - 汉坤 / 方达 / 君合 / 通商 — 老牌跨境登记流程熟
@@ -159,15 +201,20 @@ archetype == C (Delaware C-corp)
 
 ```yaml
 stage_4_output:
+  next_funding_dd_date: 2026-10-15              # Q6 输入（用于算 deadline，可填"暂无"）
   37hao_exposure_snapshot:
     scan_date: 2026-04-21
     applicable: true
     founder_status: no | in_progress | yes_current | yes_stale | unknown
     employee_pending_count: 3
     employee_registered_count: 7
+    employee_exercised_without_filing_count: 1
     dd_explosion_risk_score: 7
     red_flags_triggered: [founder_not_registered, employees_exercised_without_filing]
-  37hao_action_deadline: 2026-06-20   # 最晚完成日
+  37hao_action_deadline: 2026-06-20             # 绝对日期，从 next_funding_dd_date 反推
+  37hao_followup_commands:
+    - /startup-101 redflags                     # 若风险评分 ≥ 6
+    - /startup-101 check cross-border-payment   # 若员工期权 + 疑似 RF3 联动
 ```
 
 ## 限界

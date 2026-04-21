@@ -3,6 +3,40 @@
 All notable changes to startup-101 are documented here.
 This project adheres to [Keep a Changelog](https://keepachangelog.com/) format and [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] - 2026-04-22
+
+### Changed — 把 v0.4.1 的三件套推广到剩余 6 个命令
+
+把 `check/algorithm-filing` v0.4.1 建立的三件套（主动提问 / 绝对 deadline / follow-up 命令自动注入）应用到全部命令，建立命令级一致性。
+
+**新增字段（每条命令 profile_fields_written 至少加一个 followup_commands 字段）：**
+
+- `check/37hao-exposure` — 加 `next_funding_dd_date` 锚点 + 第五层绝对 deadline 计算 + 第六层 follow-up 自动注入
+- `check/pipl-gap` — 加 `target_launch_date` 锚点 + Q8/Q9 主动提问（EU + 自研）+ 轨道级绝对 deadline + follow-up
+- `check/eu-ai-act-tier` — 加 Q6/Q7 主动提问（中国 PI + 中国公众）+ follow-up（deadline 保持 EU 硬截止日 2025-08-02 / 2026-08-02）
+- `check/cross-border-payment` — 「紧迫度」→ `payment_target_start_date` 绝对日期 + 分路径的 kickoff 倒推 + RF3 联动自动注入 `redflags` 和 `37hao-exposure`
+- `check/license-scan` — 加 Q6-Q8 主动提问（下一次 DD / 中国 / EU）+ 按风险评分的 deadline 分层 + Llama 自动联动 `algorithm-filing` / `eu-ai-act-tier`
+- `redflags/scan-all` — 加 Q8 融资 DD 锚点 + 6 条红旗的最晚解决日按倒推排序 + overdue 状态标注
+
+### Added — 标准化 profile schema 扩展
+
+**新字段（跨多条命令引用）：**
+
+- `stage_3_output.payment_target_start_date` / `payment_deadlines` / `payment_followup_commands`
+- `stage_3_output.historical_personal_account_usage`（RF3 联动触发器）
+- `stage_4_output.next_funding_dd_date` / `37hao_followup_commands`
+- `stage_4_output.employee_exercised_without_filing_count`
+- `stage_5_output.ships_to_eu` / `training_data_includes_china_pi` / `china_public_facing`（跨命令判定信号）
+- `stage_5_output.pipl_deadlines` / `pipl_followup_commands`
+- `stage_5_output.eu_ai_act_followup_commands`
+- `stage_5_output.license_deadlines` / `license_followup_commands`
+- `stage_6_output.next_funding_dd_date`（锚定多个命令的 deadline 计算）
+- `red_flags_next_funding_dd_date` / `red_flags_followup_commands` / red_flags_snapshot.*.status
+
+### Rationale
+
+v0.4.1 commit（f34824b）只修了单条命令。这版推广确保**所有命令的交互界面一致**：菜鸟不管打哪条都得到同样的"主动问 + 绝对日期 + 自动联动"体验。一致的 profile schema 也让下一步 v0.5 的 agents（特别是 `ai-compliance-auditor`）能用统一方式读取所有命令的输出结果，不用为每条命令写特殊 case。
+
 ## [0.4.1] - 2026-04-21
 
 ### Fixed — `check/algorithm-filing` 跑 dry run 发现的 4 处设计缺陷

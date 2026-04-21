@@ -12,10 +12,13 @@ profile_fields_used:
   - stage_5_output.target_market
   - stage_5_output.user_geography
   - stage_5_output.training_compute_flops
+  - stage_5_output.training_data_includes_china_pi
+  - stage_5_output.china_public_facing
 profile_fields_written:
   - stage_5_output.eu_ai_act_role
   - stage_5_output.eu_ai_act_obligations
   - stage_5_output.eu_ai_act_deadline
+  - stage_5_output.eu_ai_act_followup_commands
 last_policy_review: 2026-04-15
 ---
 
@@ -59,6 +62,8 @@ last_policy_review: 2026-04-15
    - [d] Deep fake / 深度合成
    - [e] HR / lending / housing / credit / law enforcement / migration / biometric ID（高风险候选）
    - [f] 禁用类（social scoring / 大规模生物识别抓取 / 操纵） `[多选]`
+6. **训练语料是否含中国境内 PI？** `[Y/N/未定]` — 命中将叠加 PIPL 出境检查
+7. 产品同时面向**中国大陆公众**上线？ `[Y/N]` — 命中将叠加算法 / 大模型备案检查
 
 ## 决策逻辑
 
@@ -98,7 +103,24 @@ training_compute_flops ≥ 10^25？
 └─ 否 → 普通 GPAI 义务即可
 ```
 
-### 第四层：Art. 50 透明度义务逐项
+### 第四层：自动 follow-up 命令注入
+
+```
+Q6 ∈ {Y, 未定}（训练语料含中国 PI）?
+└─ 注入：/startup-101 check pipl-gap
+        （并特别注意 § 六 场景 1 的语义冲突：PIPL 不鼓励披露 vs AI Act 要求披露）
+
+Q7 == Y（中国公众）?
+└─ 注入：/startup-101 check algorithm-filing
+
+self_trained_model == Y + Llama 基模?
+└─ 注入：/startup-101 check license-scan   # § 2 MAU 7 亿阈值 + 境外语料联动
+
+禁用类场景 (f) 命中?
+└─ 🚩🚩 立即停止开发；不是 follow-up，是 blocker
+```
+
+### 第五层：Art. 50 透明度义务逐项
 
 | 系统类型 | 义务 | 命中？ |
 |---|---|---|
@@ -146,6 +168,11 @@ training_compute_flops ≥ 10^25？
 1. <基于命中场景动态生成>
 2. ...
 
+## 必须跑的 follow-up 命令（自动生成）
+- [ ] `/startup-101 check pipl-gap`（命中条件：Q6 = Y/未定）
+- [ ] `/startup-101 check algorithm-filing`（命中条件：Q7 = Y）
+- [ ] `/startup-101 check license-scan`（命中条件：自研 + Llama 基模）
+
 ## 冲突管理（中国 × EU）
 - PIPL 不鼓励披露训练数据细节 vs AI Act 要求训练数据摘要公开
 - 建议：训练数据摘要采用"数据类别 + 粗占比 + 来源类型"粒度披露
@@ -185,7 +212,11 @@ stage_5_output:
     - copyright_policy
     - art50_chatbot_disclosure
     - art50_watermarking
-  eu_ai_act_deadline: 2026-08-02
+  eu_ai_act_deadline: 2026-08-02                # EU 硬截止日
+  eu_ai_act_followup_commands:
+    - /startup-101 check pipl-gap               # Q6 命中
+    - /startup-101 check algorithm-filing       # Q7 命中
+    - /startup-101 check license-scan           # Llama 基模命中
   eu_ai_act_scan_date: 2026-04-21
 ```
 

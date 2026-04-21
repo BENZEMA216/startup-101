@@ -13,9 +13,15 @@ profile_fields_used:
   - stage_5_output.user_geography
   - stage_5_output.data_flow_includes_china_pi
   - stage_5_output.monthly_active_users
+  - stage_5_output.target_launch_date
+  - stage_5_output.ships_to_eu
+  - stage_5_output.self_trained_model
+  - stage_5_output.ai_product_type
 profile_fields_written:
   - stage_5_output.pipl_outbound_track
+  - stage_5_output.pipl_deadlines
   - stage_5_output.pipl_action_deadline
+  - stage_5_output.pipl_followup_commands
   - stage_5_output.pipl_red_flags
 last_policy_review: 2026-04-15
 ---
@@ -52,6 +58,9 @@ last_policy_review: 2026-04-15
 4. 是否含**敏感 PI**（14 岁以下未成年 / 人脸生物特征 / 金融账户 / 健康医疗 / 行踪轨迹 / 宗教 / 性取向）？若含，数量？
 5. 你是否是**关键信息基础设施运营者**（公用事业、金融、交通等）？ `[Y/N]`
 6. 数据流动场景？ `[A] 训练（境内采集 → 境外训练）` `[B] 推理（境内用户 → 境外模型 API）` `[C] Telemetry / 错误日志` `[D] 混合`
+7. **目标上线日 / 当前合规 deadline？（用于算绝对 deadline）** `YYYY-MM-DD / 已 live 持续运行`
+8. 是否同时面向**欧盟用户**？ `[Y/N/未定]` — 命中将叠加 EU AI Act 检查
+9. 你是否**自研模型**并面向中国公众？ `[Y/N]` — 命中将叠加算法 / 大模型备案检查
 
 ## 决策逻辑
 
@@ -93,7 +102,36 @@ PI 是否出境？
 - 若境内主体注册在自贸区 → 让用户检查当地清单
 - 清单每地不同且更新频繁，需逐项比对
 
-### 第四层：典型 AI 场景对照
+### 第四层：绝对 deadline 计算
+
+以 Q7 的 `target_launch_date`（或当前合规 deadline）为锚点：
+
+| 轨道 | kickoff 最晚日（倒推） |
+|---|---|
+| 轨道 0（免申报） | `launch_date - 60 days`（仅基础合规 + 用户同意机制） |
+| 轨道 2（SCC 备案）| `launch_date - 120 days`（备案 1-3 个月 + 预留补正） |
+| 轨道 1（安评） | `launch_date - 180 days`（45-60 工作日 + 补正通常 1-2 月）|
+
+若任何 kickoff < 今天 → 🚩 **时间线告警**，给出降级路径：
+- 延后上线 / 缩减中国用户入口（先只开海外 region）/ 加急买咨询包月服务
+
+### 第五层：自动 follow-up 命令注入
+
+```
+Q8 ∈ {Y, 未定}?
+└─ 注入：/startup-101 check eu-ai-act-tier
+
+Q9 == Y（自研 + 中国公众）?
+└─ 注入：/startup-101 check algorithm-filing
+
+训练语料疑似触"重要数据"（地理 / 公共卫生 / 工业）?
+└─ 注入：/startup-101 redflags   # 走完整 6 条扫描确认是否有其他联动
+
+纯境外架构 (archetype C) + 中国用户 > 0?
+└─ 注入：/startup-101 compare entity-structure   # （v0.5 补）回看架构是否需落境内运营方
+```
+
+### 第六层：典型 AI 场景对照
 
 | 场景 | 典型映射 |
 |---|---|
@@ -111,8 +149,21 @@ PI 是否出境？
 
 **适用性**：<命中 / 不命中 / 部分场景命中>
 **建议轨道**：轨道 0 / 2 / 1
-**目标完成时间**：T- <N> 月（相对上线日）
+**目标上线日**：YYYY-MM-DD（用户输入）
 **估算成本区间**：<X-Y> 万 RMB
+
+## 绝对 deadline 表
+| 动作 | 最晚完成 | 状态 |
+|---|---|---|
+| 律所 / 顾问 kickoff | YYYY-MM-DD | ✅ 还有 N 天 / 🚩 已晚 X 天 |
+| 材料齐全 + SCC 签署 / 事前自评估 | YYYY-MM-DD | ✅ / 🚩 |
+| 提交备案 / 安评 | YYYY-MM-DD | ✅ / 🚩 |
+| 预期获批 | = 目标上线日 | |
+
+## 必须跑的 follow-up 命令（自动生成）
+- [ ] `/startup-101 check eu-ai-act-tier`（命中条件：Q8 = Y/未定）
+- [ ] `/startup-101 check algorithm-filing`（命中条件：Q9 = Y 自研+中国公众）
+- [ ] `/startup-101 redflags`（命中条件：训练语料疑似重要数据）
 
 ## 出境数据清单（需用户确认）
 | 数据类别 | 量级 | 是否敏感 | 出境目的地 |
@@ -163,8 +214,16 @@ PI 是否出境？
 stage_5_output:
   pipl_outbound_track: 0 | 2 | 1 | not_applicable
   pipl_estimated_cost_rmb: [100000, 250000]
-  pipl_target_completion: 2026-08-30
-  pipl_action_deadline: 2026-06-15  # 启动律所 kickoff 的 deadline
+  pipl_target_launch_date: 2026-10-01           # Q7 输入（**必填**，计算 deadline 锚点）
+  pipl_deadlines:                               # 绝对日期（由 launch_date 反推）
+    kickoff: 2026-04-04
+    materials_ready: 2026-06-04
+    submission: 2026-07-04
+    expected_approval: 2026-10-01
+  pipl_action_deadline: 2026-04-04              # 最早的 kickoff 日
+  pipl_followup_commands:
+    - /startup-101 check eu-ai-act-tier         # Q8 命中
+    - /startup-101 check algorithm-filing       # Q9 命中
   pipl_red_flags:
     - no_separate_consent
     - overseas_recipient_missing_scc

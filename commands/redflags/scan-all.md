@@ -15,9 +15,12 @@ profile_fields_used:
   - stage_5_output.base_model_family
   - stage_5_output.user_geography
   - stage_5_output.mau_estimate
+  - stage_6_output.next_funding_dd_date
 profile_fields_written:
   - red_flags_triggered
   - red_flags_last_scan_at
+  - red_flags_snapshot
+  - red_flags_followup_commands
 last_policy_review: 2026-04-15
 ---
 
@@ -46,6 +49,7 @@ last_policy_review: 2026-04-15
 5. 基础模型是 Llama 家族？ `[Y/N]`
 6. 产品是 SaaS / 网络服务？ `[Y/N]`
 7. 欧盟用户 > 0（哪怕 1 人）？ `[Y/N]`
+8. **下一次融资 DD / 关键业务里程碑目标日期？（用于排序 deadline 紧迫度）** `YYYY-MM-DD / 暂无`
 
 ## 扫描逻辑
 
@@ -136,6 +140,21 @@ last_policy_review: 2026-04-15
 **严重度**：High（GDPR 罚款最高 €20M 或 4% 全球营收）
 **补救窗口**：第三方代表 1-2 周开通
 
+## 绝对 deadline 排序
+
+若用户提供了 Q8 的 `next_funding_dd_date`：
+
+| 红旗 | 最晚解决日（倒推 DD） |
+|---|---|
+| RF1 (37 号文) | `dd_date - 120 days`（补登记需 2-6 月） |
+| RF2 (IP Assignment) | `dd_date - 60 days`（全员补签 2-6 周）|
+| RF3 (个人收款) | **立刻**（外管局追溯 5 年，不等 DD）|
+| RF4 (Llama License) | `dd_date - 60 days`（替基模需 4-8 周）|
+| RF5 (AGPL 污染) | `dd_date - 45 days`（替换依赖 2-6 周）|
+| RF6 (EU Art.27) | `dd_date - 14 days`（第三方代表 1-2 周开通）|
+
+任何一条 < 今天 → 在输出首行标红"**🚨 融资时间线已不可行 — 必须延期或降级**"。
+
 ## 输出 schema
 
 ```markdown
@@ -143,17 +162,18 @@ last_policy_review: 2026-04-15
 
 **扫描范围**：主 6 条 + profile 附加项
 **命中数**：<C 条 Critical / H 条 High / M 条可能命中 / K 条未命中>
+**下一次融资 DD / 里程碑**：YYYY-MM-DD（Q8 输入，未填则跳过 deadline 排序）
 
 ## 🔴 Critical（立即处理）
-| # | 红旗 | 命中原因 | 深入命令 | 严重度 |
+| # | 红旗 | 命中原因 | 深入命令 | 最晚解决日 |
 |---|---|---|---|---|
-| 1 | Red Flag 1: 37 号文未办 | 创始人侧 unknown + 已有 Cayman | `/startup-101 check 37hao-exposure` | Critical |
-| 3 | Red Flag 3: 个人 PayPal 规模化 | 月流水估算 $8k | `/startup-101 check cross-border-payment` | Critical |
+| 1 | Red Flag 1: 37 号文未办 | 创始人侧 unknown + 已有 Cayman | `/startup-101 check 37hao-exposure` | YYYY-MM-DD（✅/🚩） |
+| 3 | Red Flag 3: 个人 PayPal 规模化 | 月流水估算 $8k | `/startup-101 check cross-border-payment` | 立刻 |
 
 ## 🟡 High（30 天内处理）
-| # | 红旗 | 命中原因 | 深入命令 | 严重度 |
+| # | 红旗 | 命中原因 | 深入命令 | 最晚解决日 |
 |---|---|---|---|---|
-| ... | ... | ... | ... | ... |
+| ... | ... | ... | ... | YYYY-MM-DD |
 
 ## ⚠️ 可能命中（需核对）
 | # | 红旗 | 需核对 | 怎么核对 |
@@ -199,26 +219,34 @@ last_policy_review: 2026-04-15
 ## 写回 profile
 
 ```yaml
-red_flags_last_scan_at: 2026-04-21
+red_flags_last_scan_at: 2026-04-22
 red_flags_triggered: [1, 3, 5]
+red_flags_next_funding_dd_date: 2026-09-01      # Q8 输入（用于 deadline 排序）
 red_flags_snapshot:
   critical:
     - id: 1
       name: 37hao_not_registered
       reason: "stage_2_output.37_wen_registered = unknown AND cayman_entity_formed = yes"
       deep_dive: /startup-101 check 37hao-exposure
-      deadline: 2026-06-20
+      deadline: 2026-05-04            # dd_date - 120 days
+      status: on_track
     - id: 3
       name: personal_paypal_subscription_scale
       reason: "payment_path_chosen = null AND monthly_flow_estimate_usd = 8000"
       deep_dive: /startup-101 check cross-border-payment
       deadline: immediate
+      status: overdue
   high:
     - id: 5
       name: agpl_in_saas
       reason: "product_form = saas AND dep includes mongodb_community"
       deep_dive: /startup-101 check license-scan
-      deadline: 2026-05-20
+      deadline: 2026-07-18            # dd_date - 45 days
+      status: on_track
+red_flags_followup_commands:                    # 去重后的深入命令集合
+  - /startup-101 check 37hao-exposure
+  - /startup-101 check cross-border-payment
+  - /startup-101 check license-scan
 ```
 
 ## 限界

@@ -12,9 +12,14 @@ profile_fields_used:
   - stage_5_output.self_trained_model
   - stage_5_output.base_model_family
   - stage_5_output.mau_estimate
+  - stage_5_output.china_public_facing
+  - stage_5_output.ships_to_eu
+  - stage_6_output.next_funding_dd_date
 profile_fields_written:
   - stage_5_output.license_scan_snapshot
+  - stage_5_output.license_deadlines
   - stage_5_output.license_remediation_deadline
+  - stage_5_output.license_followup_commands
 last_policy_review: 2026-04-15
 ---
 
@@ -56,6 +61,9 @@ last_policy_review: 2026-04-15
    - `go.mod` / `go.sum`
    - `Cargo.toml` / `Cargo.lock`
    - 或直接告诉我几个核心依赖名字
+6. **下一次融资 DD / 对外审计的目标日期？（用于倒推 license 清理 deadline）** `YYYY-MM-DD / 暂无`
+7. 产品同时面向**中国大陆公众**上线？ `[Y/N]` — Llama 命中时会叠加 algorithm-filing 检查
+8. 产品同时面向**欧盟用户**上线？ `[Y/N]` — GPAI Provider 义务要求公开版权 opt-out 政策
 
 ## 决策逻辑
 
@@ -136,6 +144,38 @@ product_form ∈ {saas, api, 网络服务}?
 - **6-8**：高风险，停止新功能发布，优先替换
 - **≥ 9**：立即下线 / 停止对外商用
 
+### 第五层：绝对 deadline 计算
+
+以 Q6 的 `next_funding_dd_date`（或对外审计日）为锚点：
+
+| 风险等级 | 清理启动最晚日 | 说明 |
+|---|---|---|
+| ≥ 9（立即） | **立刻**（T+0） | 已超过合理风险容忍 |
+| 6-8 | `dd_date - 60 days` | 替换基模 / 依赖通常 2-8 周 |
+| 3-5 | `dd_date - 30 days` | 足够加 attribution / 换最常见几条 |
+| 0-2 | 年度复查 | 融资前跑一次即可 |
+
+若 kickoff < 今天 → 🚩 延后融资 / 加急买商业 license / 启用紧急替换预案。
+
+### 第六层：自动 follow-up 命令注入
+
+```
+base_model_family == llama + Q7 == Y（中国公众）?
+└─ 注入：/startup-101 check algorithm-filing
+        （境外语料 >30% 红线在 B 轨会打回，本命令先确认 base 能不能用）
+
+base_model_family == llama + Q8 == Y（欧盟）?
+└─ 注入：/startup-101 check eu-ai-act-tier
+        （GPAI Provider 版权政策义务，Llama 自带复杂性）
+
+风险评分 ≥ 6?
+└─ 注入：/startup-101 redflags
+        （确认 RF4/RF5 联动的其他红旗是否都已清）
+
+依赖里出现 Custom / 未知 license?
+└─ 建议（非自动）：律师单独审阅
+```
+
 ## 输出 schema
 
 ```markdown
@@ -171,6 +211,19 @@ product_form ∈ {saas, api, 网络服务}?
 - Ghostscript → poppler（GPL）或商业 Adobe
 - Plausible（SaaS 托管）→ PostHog / Umami（MIT）
 
+## 绝对 deadline 表
+| 动作 | 最晚完成 | 状态 |
+|---|---|---|
+| 清理 / 替换 kickoff | YYYY-MM-DD | ✅ 还有 N 天 / 🚩 已晚 X 天 |
+| 替换方案 PoC 跑通 | YYYY-MM-DD | ✅ / 🚩 |
+| 生产切换完成 | YYYY-MM-DD | ✅ / 🚩 |
+| 下一次融资 DD / 审计 | = Q6 输入 | |
+
+## 必须跑的 follow-up 命令（自动生成）
+- [ ] `/startup-101 check algorithm-filing`（命中条件：Llama 基模 + 中国公众）
+- [ ] `/startup-101 check eu-ai-act-tier`（命中条件：Llama 基模 + 欧盟）
+- [ ] `/startup-101 redflags`（命中条件：风险评分 ≥ 6）
+
 ## 下一步
 - [ ] 将扫描结果写入 _profile.md (stage_5_output.license_scan_snapshot)
 - [ ] 若风险评分 ≥ 6：暂停 license 范围内功能的新发布
@@ -202,7 +255,8 @@ product_form ∈ {saas, api, 网络服务}?
 ```yaml
 stage_5_output:
   license_scan_snapshot:
-    scan_date: 2026-04-21
+    scan_date: 2026-04-22
+    next_funding_dd_date: 2026-09-01           # Q6 输入
     risk_score: 7
     llama_issues: [mau_threshold_close, missing_attribution]
     agpl_issues: [mongodb_community_in_saas]
@@ -211,7 +265,16 @@ stage_5_output:
       - swap_mongodb_to_postgres_by: 2026-05-20
       - add_built_with_llama_badge_by: 2026-04-28
       - evaluate_qwen_migration: exploratory
-  license_remediation_deadline: 2026-05-20
+  license_deadlines:                            # 绝对日期（由 next_funding_dd_date 反推）
+    cleanup_kickoff: 2026-07-03
+    replacement_poc: 2026-08-01
+    production_cutover: 2026-08-25
+    funding_dd_ready: 2026-09-01
+  license_remediation_deadline: 2026-07-03      # 最早的 cleanup_kickoff
+  license_followup_commands:
+    - /startup-101 check algorithm-filing       # Llama + 中国公众
+    - /startup-101 check eu-ai-act-tier         # Llama + 欧盟
+    - /startup-101 redflags                     # 风险评分 ≥ 6
 ```
 
 ## 限界
