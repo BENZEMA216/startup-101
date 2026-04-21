@@ -3,6 +3,25 @@
 All notable changes to startup-101 are documented here.
 This project adheres to [Keep a Changelog](https://keepachangelog.com/) format and [Semantic Versioning](https://semver.org/).
 
+## [0.4.1] - 2026-04-21
+
+### Fixed — `check/algorithm-filing` 跑 dry run 发现的 4 处设计缺陷
+
+- **叠加触发器从 checkbox 改为主动提问**。原实现在「第二步」罗列 6 个可勾选项让用户自我勾选，实测中菜鸟会漏勾（最常漏：EU AI Act / 数据出境）。现改为 Q5/Q7/Q8 三个主动提问，由命令自己触发叠加判定，不依赖用户自觉。
+- **基模联动自动触发境外语料红旗**。新增 Q2「基础模型家族？」，命中 Llama 2/3 微调 → 自动注入「境外语料 >30%」硬红旗（B 轨最常见打回点）+ 自动把 `/startup-101 check license-scan` 加入 follow-up 命令。Qwen / DeepSeek 等本地基模走「语料红线友好」分支。
+- **绝对 deadline 计算**。新增 Q6「目标上线日」（必填），输出表格从「距离上线 T-X 月」相对时间升级为「绝对日期 + 状态（还有 N 天 / 已晚 X 天）」。若任何里程碑 < 今天，主动告警并给出降级路径（延期 / B → C 过渡 / 放弃中国市场）。
+- **`filing_target_launch_date` 从可选升必填**。Profile schema 原标注「可选」，但所有 deadline 计算都依赖它。现作为 Q6 必填问题收集，schema 注释同步更新为 **必填**。
+
+### Changed
+
+- `check/algorithm-filing` frontmatter：`profile_fields_used` 从 5 个扩到 10 个（新增 `base_model_family` / `target_launch_date` / `deep_synthesis_features` / `ships_to_eu` / `training_data_outbound`）；`profile_fields_written` 从 3 个扩到 6 个（新增 `filing_target_launch_date` / `filing_deadlines` / `filing_followup_commands`）。
+- 决策逻辑从「三步」扩为「五步」：主轨判定 → 叠加触发器（自动）→ 基模联动 → 主体适格 → 绝对 deadline 计算。
+- 输出 schema 增加「必须跑的 follow-up 命令」section，自动根据命中条件列出兄弟命令调用，减少菜鸟漏查。
+
+### Rationale
+
+v0.4.0 commit（5e9b9a9）发布前的 dry run 挖出这 4 处：都是**命令设计上让用户做了 LLM 应该自己做的推理**。修复后 `check/algorithm-filing` 成为其他命令的"问答完备性"范式 — v0.4+ 补的新命令应参考这里的主动提问 + 自动联动 + 绝对时间线的三件套。
+
 ## [0.4.0] - 2026-04-21
 
 ### Added — Skill Pack 架构升级
