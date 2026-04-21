@@ -3,6 +3,32 @@
 All notable changes to startup-101 are documented here.
 This project adheres to [Keep a Changelog](https://keepachangelog.com/) format and [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-04-21
+
+### Added — Skill Pack 架构升级
+
+- **原子命令工具箱** — 新增 `commands/` 目录（check / review / generate / compare / redflags 五类动词），与 `modes/` stage-driven 主线形成双入口：菜鸟走 stage，老手 / 复用用户走原子命令。参考 arc-kit 的 skill pack 分发模式但保留 profile 联动。
+- **第一批 6 条高优命令**（反拆自已有 appendix / stage / red-flags）：
+  - `commands/check/algorithm-filing.md` — 算法备案三轨（A / B / C）判定 + 时间规划 + 红旗
+  - `commands/check/37hao-exposure.md` — 37 号文创始人 + 员工两侧扫描，含融资 DD 爆雷风险评分
+  - `commands/check/pipl-gap.md` — PIPL 出境三档判定（<10w / 10-100w / ≥100w + 敏感 PI）+ 自贸区豁免
+  - `commands/check/eu-ai-act-tier.md` — Provider / Deployer 角色 + GPAI / Art. 50 / Systemic Risk 判定
+  - `commands/check/cross-border-payment.md` — Stripe / Paddle / Airwallex 路径选择 + 成本对照
+  - `commands/check/license-scan.md` — Llama Community License + AGPL / SSPL 合扫（RF4 + RF5）
+  - `commands/redflags/scan-all.md` — 6 条主红旗扫描 + 深入命令路由
+- **frontmatter 约定** — 每个命令文件声明 `profile_fields_used` / `profile_fields_written` / `source_appendix` / `last_policy_review`，命令结束时按 schema 写回 `_profile.md`，完全兼容 v0.3 Profile Linkage Contract。
+
+### Changed
+
+- `SKILL.md` 新增「原子命令优先分支」路由：匹配 `/startup-101 (check|review|generate|compare) <name>` 直接加载 `commands/<category>/<name>.md`，不进入 stage 主线。
+- `SKILL.md` 命令表分两栏：主线（stage-driven）+ 原子命令（v0.4 新增）。
+- `SKILL.md` 文件加载顺序拆成两套：主线 vs 原子命令。
+- `ROADMAP.md` v0.4 从"bundled references 补齐"改为"skill pack 架构升级"；bundled references 延后到 v0.6；新增 v0.5（agents + mcp 护城河）和 v0.6（cli + docs + bundled）。
+
+### Rationale
+
+GitHub trending（2026-04）显示 arc-kit（1.5k stars，UK 企业架构 skill pack）验证了"**垂直知识 × 原子命令包**"的产品形态。startup-101 原先是单一 skill，此版本保留 stage-driven 陪伴式优势，同时获得 skill pack 的分发能力 + 老手复用体验。下一步 v0.5 的 agents / mcp 是该形态的护城河（中文生态还没人做实时合规 MCP）。
+
 ## [0.3.0] - 2026-04-15
 
 ### Added
