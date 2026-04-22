@@ -3,6 +3,43 @@
 All notable changes to startup-101 are documented here.
 This project adheres to [Keep a Changelog](https://keepachangelog.com/) format and [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-04-22
+
+### Added — agents/ 深度推理子代理 + schema 登记册
+
+v0.4 建立了原子命令工具箱，v0.5 在其之上叠加**二阶推理层**：agents 读取命令写回的 snapshot，做跨命令交叉检验 + 可交付 artifact 生成。
+
+**新增 `modes/_schema_signals.md`** — 跨命令 profile 字段登记册。v0.4 + v0.4.1 + v0.4.2 累积的所有共享字段在一个地方权威登记，分 5 类：跨命令判定信号 / 时间锚点字段 / 标准化后缀 / 联动字段 / 值域规范。防止字段名漂移（`eu_market` vs `ships_to_eu` vs `target_eu` 同义异名），并定义"`next_funding_dd_date` 以 stage_6_output 为权威源"这类冲突规则。所有命令和 agents 读写 `_profile.md` 都必须遵守。
+
+**新增 `agents/` 目录** — 与 `commands/` 互补的深度推理层：
+
+- 输入：大段文本（term sheet / 隐私政策）或完整 profile
+- 输出：分析报告 + 谈判话术 + 改写建议 + Markdown artifact
+- 调用：`/startup-101 agent <name>`
+- 前置：硬依赖命令写回的 snapshot（前置缺失时输出先决条件清单，不代跑 check）
+
+**首个 agent：`agents/ai-compliance-auditor.md`** — AI 产品全面合规体检子代理：
+
+- 读取 25 个 profile 字段（跨 Stage 2/3/4/5/6 + red_flags），消费全部 v0.4 命令的 snapshot
+- 按 12 条审计维度（中国侧合规链路 / 跨境一致性 / 股权链路 / License 时间线）做交叉检验，输出 0-100 分合规分 + 3 档 DD 就绪度
+- 产出两份 artifact：完整审计报告 + DD 专用摘要（可直接转发投资人律师作为"合规状态声明"）
+- 定义 5 条 agent 独有的**二阶推断红旗**（如 X1: Llama + 中国公众 + B 轨同时命中 = 几乎必打回）
+- DD 问答预案自动生成：针对投资人常问的 8-12 问，基于 profile 字段自动出话术
+
+### Changed
+
+- `SKILL.md` 新增 agent 路由分支（`/startup-101 agent <name>`），文件加载顺序拆出 agent 独立一套。
+- `SKILL.md` 命令表新增 Agents 栏；字段命名约定明确指向 `modes/_schema_signals.md`。
+- 原子命令分支的 flow 明确加一步"按命令末尾 follow-up section 主动列出下一步建议"。
+
+### Rationale
+
+v0.4 + v0.4.2 的累积产物是**一张有序的命令网络**（7 条命令 × 统一 schema × 绝对 deadline × follow-up 自动注入）。v0.5 的 agent 层把这张网络做**聚合与交叉检验**——用户不再需要看 7 条命令分别的 snapshot 拼凑全局状态，而是直接拿一份可交付融资 DD 的合规报告。
+
+这一步验证了 v0.4 架构升级的战略判断是对的：**skill pack 形态（多命令 × 统一 schema）才能支撑 agent 层**；如果还是单一 skill，agent 层无所适从。arc-kit 只有 commands 没有 agents，startup-101 的 agent 层是差异化能力。
+
+下一步 v0.6 将补 `mcp/`，把「命令 → agent」的决策链接入实时合规数据源（网信办备案查询 / 企业信用 / 香港公司注册处），形成**自主运行的合规体检系统**，这是中文 AI 创业合规 skill 里没人做过的位置。
+
 ## [0.4.2] - 2026-04-22
 
 ### Changed — 把 v0.4.1 的三件套推广到剩余 6 个命令
