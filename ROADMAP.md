@@ -43,27 +43,45 @@
 - [ ] `commands/redflags/founder-visa.md`
 - [ ] `commands/redflags/ai-data-source.md`
 
-## v0.5 — Agent + MCP 护城河
+## v0.5 — Agent 深度推理层（已完成首个）
 
 **目标：** 把"重推理活"和"实时合规数据查询"落成独立组件。这是 arc-kit 已有、中文生态还没人做的位置。
 
 ### agents/ — 深度推理子代理
 
+**已完成（2026-04-22）：**
+
+- [x] `agents/README.md` — agent 约定 + commands vs agents 对照
+- [x] `agents/ai-compliance-auditor.md` — 产品全面合规体检（12 维度 × 4 分组，读 25 profile 字段，产出 DD 就绪报告 + 合规状态声明两份 artifact）
+
+**待补：**
+
 - [ ] `agents/vc-term-sheet-reviewer.md` — 完整 term sheet → 逐条影响 + 谈判话术
-- [ ] `agents/ai-compliance-auditor.md` — 产品全面合规体检（覆盖 8 套法规）
 - [ ] `agents/jurisdiction-advisor.md` — 业务模型 → 推荐架构（5 分支决策）
 - [ ] `agents/fundraising-strategist.md` — 当前 profile + metrics → 融资策略
 - [ ] `agents/incorporation-checklist-gen.md` — 基于 profile 生成个性化开办清单
 
-### mcp/ — 实时合规数据查询（差异化护城河）
+### modes/_schema_signals.md — 跨命令 schema 登记册（已完成）
 
-- [ ] `mcp/gsxt.json` — 国家企业信用信息公示系统
-- [ ] `mcp/cac-filing.json` — 网信办算法备案查询（https://beian.cac.gov.cn/）
-- [ ] `mcp/cyberspace-admin.json` — 信通院大模型备案状态
-- [ ] `mcp/hkcr.json` — 香港公司注册处
-- [ ] `mcp/sec-edgar.json` — 美国 SEC EDGAR（Reg D / Form D 等）
+**已完成（2026-04-22）：**
 
-> 💡 这些 MCP 多数需要**自己写 httpx wrapper**（公共 API 或爬虫），是项目独家差异化。
+- [x] 5 类字段登记（跨命令判定信号 / 时间锚点 / 标准化后缀 / 联动字段 / 值域规范）
+- [x] `next_funding_dd_date` 双 stage 冲突规则（stage_6 权威）
+- [x] SKILL.md 字段命名权威指向
+
+## v0.6 — MCP 实时合规数据护城河
+
+**目标：** 把「命令 → agent」的决策链接入实时合规数据源。这是 arc-kit 没做过、**中文 AI 创业合规生态独家位置**。
+
+### mcp/ — 实时合规数据查询
+
+- [ ] `mcp/cac-filing-server.py` — 网信办算法备案查询（https://beian.cac.gov.cn/） + json config
+- [ ] `mcp/gsxt-server.py` — 国家企业信用信息公示系统（工商信息 / 经营范围变更历史）
+- [ ] `mcp/cyberspace-admin-server.py` — 信通院大模型备案状态
+- [ ] `mcp/hkcr-server.py` — 香港公司注册处（公司搜索 / 周年申报状态）
+- [ ] `mcp/sec-edgar.json` — 美国 SEC EDGAR（Reg D / Form D，可直接用现成 MCP）
+
+> 💡 这些 MCP 多数需要**自己写 Python + httpx wrapper**（公共 API 或爬虫），工作量 0.5-1 天/个。
 
 ### templates/ — 独立模板文件
 
@@ -73,7 +91,7 @@
 - [ ] `templates/ip-assignment.template.md`
 - [ ] `templates/esop-plan.template.md`
 
-## v0.6 — 安装 + 站点 + Bundled references 补齐
+## v0.7 — 安装 + 站点 + Bundled references 补齐
 
 ### cli/ — 一键安装
 
@@ -99,7 +117,7 @@
 - [ ] **Simon Willison Prompt Injection 精选** — CC-BY
 - [ ] **政府公开文件合集**（公有领域）
 
-## v0.7 — 审计 & 模板扩展
+## v0.8 — 审计 & 模板扩展
 
 **目标：** Stage 7 的持续义务不能只给框架，要给模板。
 
@@ -109,7 +127,7 @@
 - [ ] **FBAR / FATCA 合规 checklist**（US 股东/员工）
 - [ ] **年度合规日历**（月/季/年任务自动生成）
 
-## v0.8 — 场景化深挖
+## v0.9 — 场景化深挖
 
 **目标：** 从"通用 skill"走向"具体场景"。
 

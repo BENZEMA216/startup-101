@@ -34,6 +34,10 @@ ln -s ~/startup-101/.claude/skills/startup-101 startup-101
 
 ## 使用
 
+startup-101 支持**双入口**：菜鸟走 stage 主线，老手直接打原子命令或跑 agent 体检。
+
+### 主线（stage-driven，v0.3）
+
 ```
 /startup-101                # 默认：profile → 阶段自诊断
 /startup-101 profile        # 只做 profile 分流
@@ -41,6 +45,32 @@ ln -s ~/startup-101/.claude/skills/startup-101 startup-101
 /startup-101 redflags       # 红旗扫描
 /startup-101 checklist      # 生成完整清单
 ```
+
+### 原子命令工具箱（v0.4，7 条高优 check + 扫描）
+
+```
+/startup-101 check algorithm-filing       # 算法备案 A/B/C 三轨判定
+/startup-101 check 37hao-exposure         # 37 号文创始人 + 员工双侧扫描
+/startup-101 check pipl-gap               # PIPL 出境三档判定
+/startup-101 check eu-ai-act-tier         # EU AI Act 分级 + GPAI / Art.50
+/startup-101 check cross-border-payment   # Stripe / Paddle / Airwallex 路径
+/startup-101 check license-scan           # Llama / AGPL / SSPL 合扫
+/startup-101 redflags                     # 6 条主红旗扫描 + 深入命令路由
+```
+
+每条命令：主动提问（非 checkbox）+ 绝对 deadline（按目标日倒推）+ 自动注入 follow-up 命令。完整索引见 [`commands/README.md`](./commands/README.md)。
+
+### Agent 深度推理层（v0.5，基于 check snapshot 的二阶分析）
+
+```
+/startup-101 agent ai-compliance-auditor  # 全面合规体检，产出 DD 就绪报告
+```
+
+Agent 读取前置 check 命令写回的 snapshot，做 12 维交叉检验 + 生成可交付 DD 的 Markdown 报告。索引见 [`agents/README.md`](./agents/README.md)。
+
+### Schema 规范
+
+所有命令和 agent 读写 `_profile.md` 必须遵守 [`modes/_schema_signals.md`](./modes/_schema_signals.md) 的字段登记册，防止字段名漂移。
 
 ## 致谢
 
